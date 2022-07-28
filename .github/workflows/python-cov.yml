@@ -10,7 +10,7 @@ jobs:
     
     env:
       COVERAGE_SINGLE: 0    # this can stay as 0
-      COVERAGE_TOTAL: 100     # set it to 100 when we have full coverage
+      COVERAGE_TOTAL: 0     # set it to 100 when we have full coverage
 
     steps:
     - uses: actions/checkout@v3
@@ -32,13 +32,13 @@ jobs:
         cov-threshold-single: ${{ env.COVERAGE_SINGLE }}
         cov-threshold-total: ${{ env.COVERAGE_TOTAL }}
         
-    - name: Commit pytest coverage table if less then ${{ env.COVERAGE_TOTAL }} percent
+    - name: Commit pytest coverage table if less then ${{ env.COVERAGE_TOTAL }}%
       if: ${{ steps.pytester-cov.outputs.cov-threshold-total-fail == 'true' || steps.pytester-cov.outputs.cov-threshold-single-fail == 'true' }}
       uses: peter-evans/commit-comment@main
       with:
         body: ${{ steps.pytester-cov.outputs.output-table }}
         
-    - name: Check if cover ${{ env.COVERAGE_TOTAL }}
+    - name: Check if cover ${{ env.COVERAGE_TOTAL }}%
       if: ${{ steps.pytester-cov.outputs.cov-threshold-total-fail == 'true' || steps.pytester-cov.outputs.cov-threshold-single-fail == 'true' }}
       uses: actions/github-script@v3
       with:
