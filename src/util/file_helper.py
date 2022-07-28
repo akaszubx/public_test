@@ -21,3 +21,6 @@ class FileHelper:
     def validate_file_extension(path: str, ext: str) -> bool:
         _, file_extension = os.path.splitext(path)
         return file_extension.lower() == ext
+		
+	def test_no_cover(self):
+		return 5
