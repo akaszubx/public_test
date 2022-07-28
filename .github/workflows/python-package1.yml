@@ -14,10 +14,6 @@ jobs:
       fail-fast: false
       matrix:
         python-version: ["3.7", "3.8", "3.9", "3.10"]
-    
-    env:
-      COVERAGE_SINGLE: 0    # set it to 100 when we have full coverage
-      COVERAGE_TOTAL: 0     # set it to 100 when we have full coverage
 
     steps:
     - uses: actions/checkout@v3
@@ -39,28 +35,3 @@ jobs:
     - name: Test with pytest
       run: |
         pytest
-    - name: pytester-cov
-      id: pytester-cov
-      uses: programmingwithalex/pytester-cov@main
-      with:
-        pytest-root-dir: './src'
-        cov-omit-list: 'external/*, tests/*'
-        cov-threshold-single: ${{ env.COVERAGE_SINGLE }}
-        cov-threshold-total: ${{ env.COVERAGE_TOTAL }}
-
-    - name: Coverage single fail - exit
-      if: ${{ steps.pytester-cov.outputs.cov-threshold-single-fail == 'true' }}
-      run: |
-        echo "cov single fail ${{ steps.pytester-cov.outputs.cov-threshold-single-fail }}"
-        exit 1
-
-    - name: Coverage total fail - exit
-      if: ${{ steps.pytester-cov.outputs.cov-threshold-total-fail == 'true' }}
-      run: |
-        echo "cov total fail ${{ steps.pytester-cov.outputs.cov-threshold-total-fail }}"
-        exit 1
-
-    - name: Commit pytest coverage table
-      uses: peter-evans/commit-comment@main
-      with:
-        body: ${{ steps.pytester-cov.outputs.output-table }}

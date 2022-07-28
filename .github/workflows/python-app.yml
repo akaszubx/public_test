@@ -1,37 +1,53 @@
-# This workflow will install Python dependencies, run tests and lint with a single version of Python
+# This workflow will install Python dependencies, run tests and lint with a variety of Python versions
 # For more information see: https://help.github.com/actions/language-and-framework-guides/using-python-with-github-actions
 
-name: Python application
+name: pytest cov
 
 on:
   pull_request:
     branches: [ "master" ]
 
-permissions:
-  contents: read
-
 jobs:
   build:
-
     runs-on: ubuntu-latest
+    
+    env:
+      COVERAGE_SINGLE: 0    # set it to 100 when we have full coverage
+      COVERAGE_TOTAL: 100     # set it to 100 when we have full coverage
 
     steps:
     - uses: actions/checkout@v3
-    - name: Set up Python 3.10
+    - name: Set up Python 3.7
       uses: actions/setup-python@v3
       with:
-        python-version: "3.10"
+        python-version: 3.7
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
-        pip install flake8 pytest
-        if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
-    - name: Lint with flake8
+        if [ -f src/requirements_dev.txt ]; then pip install -r src/requirements_dev.txt; fi
+
+    - name: pytester-cov
+      id: pytester-cov
+      uses: programmingwithalex/pytester-cov@main
+      with:
+        pytest-root-dir: './src'
+        cov-omit-list: 'external/*, tests/*'
+        cov-threshold-single: ${{ env.COVERAGE_SINGLE }}
+        cov-threshold-total: ${{ env.COVERAGE_TOTAL }}
+
+    - name: Coverage single fail - exit
+      if: ${{ steps.pytester-cov.outputs.cov-threshold-single-fail == 'true' }}
       run: |
-        # stop the build if there are Python syntax errors or undefined names
-        flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
-        # exit-zero treats all errors as warnings. The GitHub editor is 127 chars wide
-        flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
-    - name: Test with pytest
+        echo "cov single fail ${{ steps.pytester-cov.outputs.cov-threshold-single-fail }}"
+        exit 1
+
+    - name: Coverage total fail - exit
+      if: ${{ steps.pytester-cov.outputs.cov-threshold-total-fail == 'true' }}
       run: |
-        pytest
+        echo "cov total fail ${{ steps.pytester-cov.outputs.cov-threshold-total-fail }}"
+        exit 1
+
+    - name: Commit pytest coverage table
+      uses: peter-evans/commit-comment@main
+      with:
+        body: ${{ steps.pytester-cov.outputs.output-table }}
