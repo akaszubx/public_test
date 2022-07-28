@@ -1,0 +1,8 @@
+*.pyc
+*.orig
+/venv
+/.idea
+/src/seamless-update-agent.log
+/src/.coverage
+/src/htmlcov
+/src/tmp_files/
