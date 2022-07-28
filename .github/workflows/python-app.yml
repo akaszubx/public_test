@@ -36,7 +36,7 @@ jobs:
         cov-threshold-total: ${{ env.COVERAGE_TOTAL }}
         
     - name: Coverage check
-      if: ${{ steps.pytester-cov.outputs.cov-threshold-total-fail == 'true' || steps.pytester-cov.outputs.cov-threshold-single-fail == 'true'}
+      if: ${{ steps.pytester-cov.outputs.cov-threshold-total-fail == 'true' || steps.pytester-cov.outputs.cov-threshold-single-fail == 'true' }}
       uses: actions/github-script@v3
       with:
         script: |
