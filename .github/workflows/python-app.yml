@@ -46,4 +46,4 @@ jobs:
       uses: actions/github-script@v3
       with:
         script: |
-            core.setFailed(steps.pytester-cov.outputs.output-table)
+            core.setFailed('Code is not fully cover, see comment for more details.')
