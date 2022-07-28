@@ -22,5 +22,5 @@ class FileHelper:
         _, file_extension = os.path.splitext(path)
         return file_extension.lower() == ext
 		
-	def test_no_cover(self):
-		return 5
+    def test_no_cover(self):
+        return 5
